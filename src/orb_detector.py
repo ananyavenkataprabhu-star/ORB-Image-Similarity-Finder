@@ -2,7 +2,7 @@
 import cv2
 
 # Load an image
-image = cv2.imread("dataset/test.jpg")
+image = cv2.imread("dataset/Buildings/build_01.jpg")
 
 if image is None:
     print("Could not load image. Check the image path.")

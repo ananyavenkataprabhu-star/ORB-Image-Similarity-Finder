@@ -1,0 +1,21 @@
+image_path,group_id,related_to,category,version_type,expected_match
+originals/buildings/build_01.jpg,build_01,,buildings,original,reference
+originals/buildings/build_02.jpg,build_02,,buildings,original,reference
+originals/buildings/build_03.jpg,build_03,,buildings,original,reference
+originals/buildings/build_04.jpg,build_04,,buildings,original,reference
+originals/buildings/build_05.jpg,build_05,,buildings,original,reference
+originals/landscapes/land_01.jpg,land_01,,landscapes,original,reference
+originals/landscapes/land_02.jpg,land_02,,landscapes,original,reference
+originals/landscapes/land_03.jpg,land_03,,landscapes,original,reference
+originals/landscapes/land_04.jpg,land_04,,landscapes,original,reference
+originals/landscapes/land_05.jpg,land_05,,landscapes,original,reference
+originals/objects/obj_01.jpg,obj_01,,objects,original,reference
+originals/objects/obj_02.jpg,obj_02,,objects,original,reference
+originals/objects/obj_03.jpg,obj_03,,objects,original,reference
+originals/objects/obj_04.jpg,obj_04,,objects,original,reference
+originals/objects/obj_05.jpg,obj_05,,objects,original,reference
+modified/mod_01_rotated.jpg,build_03,originals/buildings/build_03.jpg,buildings,rotated,should match linked original
+modified/mod_02_cropped.jpg,obj_01,originals/objects/obj_01.jpg,objects,cropped,should match linked original
+modified/mod_03_resized.jpg,build_05,originals/buildings/build_05.jpg,buildings,resized,should match linked original
+modified/mod_04_darkened.jpg,land_01,originals/landscapes/land_01.jpg,landscapes,darkened,should match linked original
+modified/mod_05_rotated_resized.jpg,land_02,originals/landscapes/land_02.jpg,landscapes,rotated_resized,should match linked original
