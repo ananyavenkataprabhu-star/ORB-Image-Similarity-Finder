@@ -13,7 +13,7 @@ DATASET_DIR = os.path.join(BASE_DIR, "dataset")
 OUTPUT_DIR = os.path.join(BASE_DIR, "outputs")
 
 QUERY_PATH = os.path.join(
-    DATASET_DIR, "Buildings", "build_01.jpg"
+    DATASET_DIR, "Buildings", "build_07.jpg"
 )
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -152,7 +152,8 @@ for i, result in enumerate(results[:5], start=1):
 # 6. DISPLAY QUERY IMAGE
 # -----------------------------------
 
-cv2.imshow("Query Image", query)
+query_display = cv2.resize(query, (960, 540))
+cv2.imshow("Query Image", query_display)
 
 # -----------------------------------
 # 7. DISPLAY TOP 5 RESULTS
@@ -163,11 +164,9 @@ if not results:
 else:
     for i, result in enumerate(results[:5], start=1):
 
-        display = result["image"].copy()
+        display = cv2.resize(result["image"], (450, 300))
 
-        text = (
-            f"Rank {i} | Inliers: {result['inliers']}"
-        )
+        text = f"Rank {i} | Inliers: {result['inliers']}"
 
         cv2.putText(
             display,
@@ -177,12 +176,9 @@ else:
             0.8,
             (0, 255, 0),
             2
-        )
-
-        display = cv2.resize(display, (450, 300))
+    )
 
         cv2.imshow(f"Rank {i}", display)
-
     # Save the best matching image
     best = results[0]
 

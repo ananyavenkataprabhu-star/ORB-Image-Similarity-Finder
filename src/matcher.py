@@ -51,22 +51,22 @@ def _pack(kp, des, shape):
     return {"pts": pts, "des": des, "shape": shape, "n": len(pts)}
 
 
-def extract(path, method="orb", use_cache=True):
+def extract(path, method="orb", use_cache=True):    #generates cache key
     """Keypoint coordinates + descriptors for one image, cached on disk."""
     key = hashlib.md5(
         f"{os.path.abspath(path)}|{os.path.getmtime(path)}|{method}".encode()
     ).hexdigest()
-    cache_path = os.path.join(CACHE_DIR, key + ".pkl")
+    cache_path = os.path.join(CACHE_DIR, key + ".pkl")  #checking if cache exists for the image and method
     if use_cache and os.path.exists(cache_path):
         with open(cache_path, "rb") as f:
             return pickle.load(f)
 
-    _, gray = load_gray(path)
+    _, gray = load_gray(path)   #extracting features if no cache exists
     kp, des = make_detector(method).detectAndCompute(gray, None)
     feat = _pack(kp, des, gray.shape)
 
     if use_cache:
-        os.makedirs(CACHE_DIR, exist_ok=True)
+        os.makedirs(CACHE_DIR, exist_ok=True)   #saving the extracted features to cache for future use
         with open(cache_path, "wb") as f:
             pickle.dump(feat, f)
     return feat
@@ -82,13 +82,13 @@ def match(f1, f2, ratio=0.75, min_good=10, ransac_thr=5.0):
 
     bf = cv2.BFMatcher(cv2.NORM_HAMMING)
     pairs = bf.knnMatch(f1["des"], f2["des"], k=2)
-    good = [p[0] for p in pairs
+    good = [p[0] for p in pairs     #creates a list only containing the matches made with lowe's ratio test
             if len(p) == 2 and p[0].distance < ratio * p[1].distance]
-    if len(good) < min_good:
+    if len(good) < min_good: 
         return 0, len(good), None, []
 
-    src = np.float32([f1["pts"][m.queryIdx] for m in good]).reshape(-1, 1, 2)
-    dst = np.float32([f2["pts"][m.trainIdx] for m in good]).reshape(-1, 1, 2)
+    src = np.float32([f1["pts"][m.queryIdx] for m in good]).reshape(-1, 1, 2)   #formatting the keypoints of the first image to be used in RANSAC
+    dst = np.float32([f2["pts"][m.trainIdx] for m in good]).reshape(-1, 1, 2)   #formatting the keypoints of the second image to be used in RANSAC
     H, mask = cv2.findHomography(src, dst, cv2.RANSAC, ransac_thr)
     if H is None or mask is None:
         return 0, len(good), None, []
