@@ -20,7 +20,7 @@ QUERY_PATH = os.path.join(
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ORB and matching settings
-MIN_INLIERS = 15
+MIN_INLIERS = 7
 RANSAC_THRESHOLD = 5.0
 
 
@@ -130,6 +130,7 @@ def search(query_path, dataset_dir, top_n=6,
         if inliers >= MIN_INLIERS:
             results.append({
                 "path": path,
+                "matches":len(good),
                 "inliers": inliers,
                 "ratio": inlier_ratio
             })
@@ -139,6 +140,42 @@ def search(query_path, dataset_dir, top_n=6,
         key=lambda x: (x["inliers"], x["ratio"]),
         reverse=True
     )
+
+    # Generate CSV report
+    output_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "outputs"
+    )
+    os.makedirs(output_dir, exist_ok=True)
+
+    report_path = os.path.join(
+        output_dir, "similarity_report.csv"
+    )
+
+    with open(report_path, "w", newline="") as file:
+        writer = csv.writer(file)
+
+        writer.writerow([
+            "Rank",
+            "Query Image",
+            "Matched Image",
+            "Good Matches",
+            "Inliers",
+            "Inlier Ratio"
+        ])
+
+        for rank, result in enumerate(results[:top_n], start=1):
+            writer.writerow([
+                rank,
+                os.path.basename(query_path),
+                os.path.relpath(result["path"], dataset_dir),
+                result["matches"],
+                result["inliers"],
+                round(result["ratio"], 3)
+            ])
+
+    print("CSV report generated:", report_path)
+
 
     # Return paths and inlier counts for Streamlit
     return [
