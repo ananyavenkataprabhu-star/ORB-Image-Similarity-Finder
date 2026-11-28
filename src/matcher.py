@@ -105,25 +105,46 @@ def classify(inliers, dup_thr=DUP_THR, sim_thr=SIM_THR):
     return "different"
 
 
+
 def visualize(p1, p2, method="orb", ratio=0.75, draw_box=True):
-    """Side-by-side image with match lines (+ bounding box). Returns (vis, inliers, good)."""
+    """Side-by-side image with verified feature matches."""
+
     img1, g1 = load_gray(p1)
     img2, g2 = load_gray(p2)
+
     det = make_detector(method)
     k1, d1 = det.detectAndCompute(g1, None)
     k2, d2 = det.detectAndCompute(g2, None)
-    n, good, H, inliers = match(_pack(k1, d1, g1.shape), _pack(k2, d2, g2.shape), ratio)
+
+    n, good, H, inliers = match(
+        _pack(k1, d1, g1.shape),
+        _pack(k2, d2, g2.shape),
+        ratio
+    )
 
     right = img2.copy()
+
     if H is not None and draw_box:
         h, w = g1.shape
-        box = np.float32([[0, 0], [w, 0], [w, h], [0, h]]).reshape(-1, 1, 2)
+        box = np.float32([
+            [0, 0], [w, 0], [w, h], [0, h]
+        ]).reshape(-1, 1, 2)
+
         proj = cv2.perspectiveTransform(box, H)
-        right = cv2.polylines(right, [np.int32(proj)], True, (0, 255, 0), 3)
+        right = cv2.polylines(
+            right, [np.int32(proj)], True,
+            (0, 255, 0), 3
+        )
+
+    # Display only the 40 strongest verified matches
+    display_matches = sorted(
+        inliers, key=lambda m: m.distance
+    )[:40]
 
     vis = cv2.drawMatches(
-        img1, k1, right, k2, inliers, None,
+        img1, k1, right, k2, display_matches, None,
         matchColor=(0, 255, 0),
         flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS,
     )
+
     return vis, n, good
