@@ -2,6 +2,7 @@
 import cv2
 import numpy as np
 import os
+import csv
 
 # -----------------------------------
 # 1. PROJECT PATHS AND SETTINGS
@@ -136,6 +137,43 @@ results.sort(
     key=lambda x: (x["inliers"], x["ratio"]),
     reverse=True
 )
+
+# -----------------------------------
+# 6. GENERATE CSV REPORT
+# -----------------------------------
+
+report_path = os.path.join(
+    OUTPUT_DIR, "similarity_report.csv"
+)
+
+with open(report_path, "w", newline="") as file:
+
+    writer = csv.writer(file)
+
+    # CSV column headings
+    writer.writerow([
+        "Rank",
+        "Query Image",
+        "Matched Image",
+        "Good Matches",
+        "Inliers",
+        "Inlier Ratio"
+    ])
+
+    # Write matching results
+    for rank, result in enumerate(results, start=1):
+
+        writer.writerow([
+            rank,
+            os.path.basename(QUERY_PATH),
+            os.path.relpath(result["path"], DATASET_DIR),
+            result["matches"],
+            result["inliers"],
+            round(result["ratio"], 3)
+        ])
+
+print("\nCSV report generated successfully!")
+print("Report saved at:", report_path)
 
 print("\nTOP VERIFIED SIMILAR IMAGES")
 print("--------------------------------")
